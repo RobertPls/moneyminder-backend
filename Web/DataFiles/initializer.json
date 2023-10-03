@@ -1,0 +1,23 @@
+{
+	"roles": [
+		{
+			"role": "ClientUser",
+			"permissions": [
+			]
+		}
+	],
+	"users": [
+		{
+			"userName": "usuario2023",
+			"firstName": "Robert",
+			"lastName": "Perez",
+			"email": "robertPerezLino@gmail.com",
+			"password": "rpl123456789",
+			"userroles": [
+				{ "role": "ClientUser" }
+			]
+		}
+	
+	]
+}
+
