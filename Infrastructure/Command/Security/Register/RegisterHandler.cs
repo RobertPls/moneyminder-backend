@@ -1,28 +1,44 @@
 ﻿using Application.UseCase.Command.Security.Register;
 using Application.Utils;
-using Infrastructure.Security;
+using Domain.Events.Users;
+using Domain.Factories.Users;
+using Infrastructure.EntityFramework.ReadModel.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using SharedKernel.Core;
 
 namespace Infrastructure.Command.Security.Register
 {
     internal class RegisterHandler : IRequestHandler<RegisterCommand, Result>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<UserReadModel> _userManager;
         private readonly ILogger<RegisterHandler> _logger;
 
-        public RegisterHandler(UserManager<ApplicationUser> userManager, ILogger<RegisterHandler> logger)
+        //--------Event
+        private readonly IMediator _mediator;
+        //-------------
+
+        private readonly IUserFactory _userFactory;
+        private readonly IUnitOfWork _unitOfWork;
+
+
+        public RegisterHandler(UserManager<UserReadModel> userManager, IUserFactory userFactory, ILogger<RegisterHandler> logger, IUnitOfWork unitOfWort, IMediator mediator)
         {
             _userManager = userManager;
+            _userFactory = userFactory;
+            _mediator = mediator;
             _logger = logger;
+            _unitOfWork = unitOfWort;
         }
 
         public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            bool emailConfirmationRequired = false;
+            var emailConfirmationRequired = false;
+            List<string> rol = new List<string> { "ClientUser" };
+
             _logger.LogInformation($"{request.Email} is trying to register");
-            var newUser = new ApplicationUser(request.Username, request.FirstName, request.LastName, request.Email, true, false);
+            var newUser = new UserReadModel(request.UserName, request.FirstName, request.LastName, request.Email, true, false);
 
             IdentityResult userCreated = await _userManager.CreateAsync(newUser, request.Password);
 
@@ -39,8 +55,12 @@ namespace Infrastructure.Command.Security.Register
                     if (result.Succeeded)
                     {
 
-                        await _userManager.AddToRolesAsync(newUser, request.Roles.AsEnumerable());
+                        await _userManager.AddToRolesAsync(newUser, rol );
 
+                        var domainEvent = new CreatedUser(newUser.Id);
+                        domainEvent.MarkAsConsumed();
+                        await _mediator.Publish(domainEvent);
+                        await _unitOfWork.Commit();
                         return new Result(true, "User created");
                     }
                     else

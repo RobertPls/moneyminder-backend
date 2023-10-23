@@ -1,28 +1,30 @@
 ﻿using SharedKernel.Core;
-using SharedKernel.Rules;
 
 namespace Domain.ValueObjects
 {
     public record DateValue : ValueObject
     {
-        public DateOnly Date { get; init; }
+        public DateTime Date { get; init; }
 
-        public DateValue(DateOnly date)
+        public DateValue(DateTime date)
         {
-            if (date > DateOnly.FromDateTime(DateTime.Now))
+            var currentDate = DateTime.Now;
+            var inputDate = date.Date;
+
+            if (inputDate > currentDate)
             {
-                throw new ArgumentException("La fecha no puede ser en el futuro.", nameof(date));
+                throw new BussinessRuleValidationException("Date cannot be in the future.");
             }
 
-            Date = date;
+            Date = inputDate;
         }
 
-        public static implicit operator DateOnly(DateValue value)
+        public static implicit operator DateTime(DateValue value)
         {
             return value.Date;
         }
 
-        public static implicit operator DateValue(DateOnly date)
+        public static implicit operator DateValue(DateTime date)
         {
             return new DateValue(date);
         }

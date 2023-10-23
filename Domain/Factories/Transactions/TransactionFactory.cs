@@ -1,17 +1,24 @@
-﻿using Domain.Models.Transactions;
+﻿using Domain.Events.Transactions;
+using Domain.Models.Transactions;
 
 namespace Domain.Factories.Transactions
 {
     public class TransactionFactory : ITransactionFactory
     {
-        public Transaction CreateTransactionIncome(Guid accountId, Guid categoryId, DateOnly date, decimal amount, string description)
+        public Transaction CreateIncomeTransaction(Guid accountId, Guid? categoryId, DateTime date, decimal amount, string description)
         {
-            return new Transaction(accountId, categoryId, date, amount, description, TransactionType.Income);
+            var obj = new Transaction(accountId,categoryId, date, amount, description, TransactionType.Income);
+            var domainEvent = new CreatedTransaction(obj.AccountId, obj.Amount, obj.Type);
+            obj.AddDomainEvent(domainEvent);
+            return obj;
         }
 
-        public Transaction CreateTransactionOutcome(Guid accountId, Guid categoryId, DateOnly date, decimal amount, string description)
+        public Transaction CreateOutcomeTransaction(Guid accountId, Guid? categoryId, DateTime date, decimal amount, string description)
         {
-            return new Transaction(accountId, categoryId, date, amount, description, TransactionType.Outcome);
+            var obj = new Transaction(accountId, categoryId, date, amount, description, TransactionType.Outcome);
+            var domainEvent = new CreatedTransaction(obj.AccountId, obj.Amount, obj.Type);
+            obj.AddDomainEvent(domainEvent);
+            return obj;
         }
     }
 }

@@ -5,26 +5,26 @@ namespace Domain.ValueObjects
 {
     public record CategoryNameValue : ValueObject
     {
-        public string Name { get; init; }
+        public string CategoryName { get; init; }
 
-        public CategoryNameValue(string name)
+        public CategoryNameValue(string categoryName)
         {
-            CheckRule(new StringNotNullOrEmptyRule(name));
-            if (name.Length > 50)
+            CheckRule(new StringNotNullOrEmptyRule(categoryName));
+            if (categoryName.Length > 50)
             {
-                throw new BussinessRuleValidationException("Name no puede tener mas de 50 caracteres");
+                throw new BussinessRuleValidationException("Category Name cannot be more than 50 characters");
             }
-            Name = name;
+            CategoryName = categoryName;
         }
 
         public static implicit operator string(CategoryNameValue value)
         {
-            return value.Name;
+            return value.CategoryName;
         }
 
-        public static implicit operator CategoryNameValue(string name)
+        public static implicit operator CategoryNameValue(string categoryName)
         {
-            return new CategoryNameValue(name);
+            return new CategoryNameValue(categoryName);
         }
     }
 }

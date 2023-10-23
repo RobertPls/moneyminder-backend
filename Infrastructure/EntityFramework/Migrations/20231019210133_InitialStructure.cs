@@ -35,6 +35,7 @@ namespace Infrastructure.EntityFramework.Migrations
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     Staff = table.Column<bool>(type: "bit", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(38,2)", precision: 38, scale: 2, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -71,6 +72,27 @@ namespace Infrastructure.EntityFramework.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Account",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    userId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    balance = table.Column<decimal>(type: "decimal(38,2)", precision: 38, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Account", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Account_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -160,6 +182,65 @@ namespace Infrastructure.EntityFramework.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Category",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    userId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Category_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    accountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    categoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    relatedTransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    amount = table.Column<decimal>(type: "decimal(38,2)", precision: 38, scale: 2, nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Account_accountId",
+                        column: x => x.accountId,
+                        principalTable: "Account",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_Transaction_Category_categoryId",
+                        column: x => x.categoryId,
+                        principalTable: "Category",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Transaction_relatedTransactionId",
+                        column: x => x.relatedTransactionId,
+                        principalTable: "Transaction",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Account_userId",
+                table: "Account",
+                column: "userId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -198,6 +279,26 @@ namespace Infrastructure.EntityFramework.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Category_userId",
+                table: "Category",
+                column: "userId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_accountId",
+                table: "Transaction",
+                column: "accountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_categoryId",
+                table: "Transaction",
+                column: "categoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_relatedTransactionId",
+                table: "Transaction",
+                column: "relatedTransactionId");
         }
 
         /// <inheritdoc />
@@ -219,7 +320,16 @@ namespace Infrastructure.EntityFramework.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Transaction");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Account");
+
+            migrationBuilder.DropTable(
+                name: "Category");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

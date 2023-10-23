@@ -5,26 +5,26 @@ namespace Domain.ValueObjects
 {
     public record AccountNameValue : ValueObject
     {
-        public string Name { get; init; }
+        public string AccountName { get; init; }
 
-        public AccountNameValue(string name)
+        public AccountNameValue(string accountName)
         {
-            CheckRule(new StringNotNullOrEmptyRule(name));
-            if (name.Length > 100)
+            CheckRule(new StringNotNullOrEmptyRule(accountName));
+            if (accountName.Length > 100)
             {
-                throw new BussinessRuleValidationException("Name no puede tener mas de 100 caracteres");
+                throw new BussinessRuleValidationException("Account Name cannot be more than 100 characters");
             }
-            Name = name;
+            AccountName = accountName;
         }
 
         public static implicit operator string(AccountNameValue value)
         {
-            return value.Name;
+            return value.AccountName;
         }
 
-        public static implicit operator AccountNameValue(string name)
+        public static implicit operator AccountNameValue(string accountName)
         {
-            return new AccountNameValue(name);
+            return new AccountNameValue(accountName);
         }
     }
 }

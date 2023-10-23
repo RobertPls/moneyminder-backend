@@ -4,8 +4,9 @@ using Application.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-namespace Web.Controllers.Security
+namespace Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -28,6 +29,7 @@ namespace Web.Controllers.Security
 
             if (result.Success)
             {
+
                 return Ok(new
                 {
                     jwt = result.Value,

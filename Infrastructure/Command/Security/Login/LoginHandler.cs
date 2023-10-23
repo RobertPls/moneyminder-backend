@@ -1,5 +1,6 @@
 ﻿using Application.UseCase.Command.Security.Login;
 using Application.Utils;
+using Infrastructure.EntityFramework.ReadModel.Users;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -13,13 +14,13 @@ namespace Infrastructure.Command.Security.Login
 {
     internal class LoginHandler : IRequestHandler<LoginCommand, Result<string>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<UserReadModel> _userManager;
+        private readonly SignInManager<UserReadModel> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly JwtOptions _jwtOptions;
         private readonly ILogger<LoginHandler> _logger;
 
-        public LoginHandler(UserManager<ApplicationUser> userManager, JwtOptions jwtOptions, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, ILogger<LoginHandler> logger)
+        public LoginHandler(UserManager<UserReadModel> userManager, JwtOptions jwtOptions, RoleManager<ApplicationRole> roleManager, SignInManager<UserReadModel> signInManager, ILogger<LoginHandler> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -38,7 +39,8 @@ namespace Infrastructure.Command.Security.Login
                 user = await _userManager.FindByEmailAsync(request.username);
                 if (user == null)
                 {
-                    _logger.LogWarning("Email {request.email} is not registered", request.username);                 
+                    _logger.LogWarning("Email {request.email} is not registered", request.username);
+                    return new Result<string>(false, "User not found");
                 }
             }
 
@@ -57,7 +59,7 @@ namespace Infrastructure.Command.Security.Login
             return new Result<string>(false, "User not found");
         }
 
-        private async Task<string> GenerateJwt(ApplicationUser user)
+        private async Task<string> GenerateJwt(UserReadModel user)
         {
             _logger.LogInformation($"Generating JWT for user {user.UserName}");
             var authClaims = new List<Claim>

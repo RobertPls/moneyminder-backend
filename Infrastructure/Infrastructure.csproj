@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -25,13 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="EntityFramework\Config\WriteConfig\" />
-    <Folder Include="EntityFramework\Config\ReadConfig\" />
-    <Folder Include="EntityFramework\Repository\" />
-    <Folder Include="EntityFramework\ReadModel\" />
   </ItemGroup>
 
 </Project>

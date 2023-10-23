@@ -12,7 +12,7 @@ namespace Domain.ValueObjects
             CheckRule(new StringNotNullOrEmptyRule(description));
             if (description.Length > 1000)
             {
-                throw new BussinessRuleValidationException("Description no puede tener mas de 1000 caracteres");
+                throw new BussinessRuleValidationException("Description cannot be more than 1000 characters");
             }
             Description = description;
         }

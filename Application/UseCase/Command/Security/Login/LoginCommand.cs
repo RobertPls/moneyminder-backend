@@ -8,5 +8,10 @@ namespace Application.UseCase.Command.Security.Login
         public string username { get; set; }
         public string password { get; set; }
 
+        public LoginCommand(string username, string password)
+        {
+            this.username = username;
+            this.password = password;
+        }
     }
 }

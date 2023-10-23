@@ -1,5 +1,4 @@
 using Infrastructure.Security;
-using Microsoft.AspNetCore.Hosting;
 using Web;
 
 public static class Program
