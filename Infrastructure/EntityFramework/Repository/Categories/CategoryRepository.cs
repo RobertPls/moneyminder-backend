@@ -24,7 +24,7 @@ namespace Infrastructure.EntityFramework.Repository.Categories
         }
         public async Task<Category?> FindByNameAsync(Guid id, string name)
         {
-            return await _context.Category.FirstOrDefaultAsync(x => x.Name.ToString().ToLower() == name.ToLower() && x.UserId == id);
+            return await _context.Category.FirstOrDefaultAsync(x => x.Name.ToString().ToLower() == name.ToLower() && x.UserProfileId == id);
         }
         public Task RemoveAsync(Category obj)
         {

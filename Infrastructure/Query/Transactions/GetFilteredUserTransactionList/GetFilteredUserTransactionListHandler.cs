@@ -17,7 +17,7 @@ namespace Infrastructure.Query.Transactions.GetFilteredUserTransactionList
         }
         public async Task<Result<IEnumerable<TransactionDto>>> Handle(GetFilteredUserTransactionListQuery request, CancellationToken cancellationToken)
         {
-            var query = transaction.Where(x => x.Account.UserId == request.UserId).AsNoTracking().AsQueryable();
+            var query = transaction.Where(x => x.Account.UserProfile.UserId == request.UserId).AsNoTracking().AsQueryable();
 
             query = DateFilter(query, request.SinceDate, request.UntilDate);
 

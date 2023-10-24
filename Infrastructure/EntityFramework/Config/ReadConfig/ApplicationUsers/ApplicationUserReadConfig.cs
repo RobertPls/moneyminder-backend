@@ -1,12 +1,12 @@
-﻿using Infrastructure.EntityFramework.ReadModel.Users;
+﻿using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.EntityFramework.Config.ReadConfig.Users
 {
-    internal class UserReadConfig : IEntityTypeConfiguration<UserReadModel>
+    internal class ApplicationUserReadConfig : IEntityTypeConfiguration<ApplicationUser>
     {
-        public void Configure(EntityTypeBuilder<UserReadModel> builder)
+        public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
             builder.ToTable("AspNetUsers");
             builder.HasKey(x => x.Id);

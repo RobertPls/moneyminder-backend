@@ -1,4 +1,4 @@
-﻿using Domain.Events.Users;
+﻿using Domain.Events.UserProfiles;
 using Domain.Factories.Accounts;
 using Domain.Repositories.Accounts;
 using MediatR;
@@ -6,7 +6,7 @@ using SharedKernel.Core;
 
 namespace Application.UseCase.Consumers.Accounts
 {
-    public class CreateFirstUserAccountHandler : INotificationHandler<CreatedUser>
+    public class CreateFirstUserAccountHandler : INotificationHandler<CreatedUserProfile>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IAccountFactory _accountFactory;
@@ -19,9 +19,9 @@ namespace Application.UseCase.Consumers.Accounts
             _unitOfWork = unitOfWort;
         }
 
-        public async Task Handle(CreatedUser notification, CancellationToken cancellationToken)
+        public async Task Handle(CreatedUserProfile notification, CancellationToken cancellationToken)
         {
-            var account = _accountFactory.Create(notification.UserId, "Billetera", "Dinero Fisico");
+            var account = _accountFactory.Create(notification.UserProfileId, "Billetera", "Dinero Fisico");
             await _accountRepository.CreateAsync(account);
         }
     }

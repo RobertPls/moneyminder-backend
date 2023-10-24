@@ -1,8 +1,7 @@
 ﻿using Domain.Events.Transactions;
-using Domain.Factories.Accounts;
 using Domain.Models.Transactions;
 using Domain.Repositories.Accounts;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
 
@@ -11,13 +10,13 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
     public class UpdateBalanceAccountAfterTransactionCreatedHandler : INotificationHandler<CreatedTransaction>
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateBalanceAccountAfterTransactionCreatedHandler(IAccountRepository accountRepository, IUserRepository userRepository, IUnitOfWork unitOfWort)
+        public UpdateBalanceAccountAfterTransactionCreatedHandler(IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IUnitOfWork unitOfWort)
         {
             _accountRepository = accountRepository;
-            _userRepository = userRepository;
+            _userProfileRepository = userProfileRepository;
             _unitOfWork = unitOfWort;
         }
 

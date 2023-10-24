@@ -18,7 +18,7 @@ namespace Infrastructure.Query.Transactions.GetFilteredUserBalance
         }
         public async Task<Result<BalanceDto>> Handle(GetFilteredUserBalanceQuery request, CancellationToken cancellationToken)
         {
-            var query = transaction.Where(x => x.Account.UserId == request.UserId).AsNoTracking().AsQueryable();
+            var query = transaction.Where(x => x.Account.UserProfile.UserId == request.UserId).AsNoTracking().AsQueryable();
 
             query = DateFilter(query, request.SinceDate, request.UntilDate);
 

@@ -1,4 +1,4 @@
-﻿using Domain.Events.Users;
+﻿using Domain.Events.UserProfiles;
 using Domain.Factories.Categories;
 using Domain.Repositories.Categories;
 using MediatR;
@@ -6,7 +6,7 @@ using SharedKernel.Core;
 
 namespace Application.UseCase.EventHandlers.AggregateUserEvents
 {
-    public class CreateDefaultUserCategoriesHandler : INotificationHandler<CreatedUser>
+    public class CreateDefaultUserCategoriesHandler : INotificationHandler<CreatedUserProfile>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICategoryFactory _categoryFactory;
@@ -19,14 +19,14 @@ namespace Application.UseCase.EventHandlers.AggregateUserEvents
             _unitOfWork = unitOfWort;
         }
 
-        public async Task Handle(CreatedUser notification, CancellationToken cancellationToken)
+        public async Task Handle(CreatedUserProfile notification, CancellationToken cancellationToken)
         {
-            var categoryAdjustment = _categoryFactory.Create(notification.UserId, "Ajuste", true);
-            var categoryEntertainment = _categoryFactory.Create(notification.UserId, "Entretenimiento", true);
-            var categoryFood = _categoryFactory.Create(notification.UserId, "Alimentacion", true);
-            var categoryTransport = _categoryFactory.Create(notification.UserId, "Transporte", true);
-            var categoryHealth = _categoryFactory.Create(notification.UserId, "Salud", true);
-            var categoryTravel = _categoryFactory.Create(notification.UserId, "Viaje", true);
+            var categoryAdjustment = _categoryFactory.Create(notification.UserProfileId, "Ajuste", true);
+            var categoryEntertainment = _categoryFactory.Create(notification.UserProfileId, "Entretenimiento", true);
+            var categoryFood = _categoryFactory.Create(notification.UserProfileId, "Alimentacion", true);
+            var categoryTransport = _categoryFactory.Create(notification.UserProfileId, "Transporte", true);
+            var categoryHealth = _categoryFactory.Create(notification.UserProfileId, "Salud", true);
+            var categoryTravel = _categoryFactory.Create(notification.UserProfileId, "Viaje", true);
 
             await _categoryRepository.CreateAsync(categoryAdjustment);
             await _categoryRepository.CreateAsync(categoryEntertainment);

@@ -1,9 +1,7 @@
 ﻿using Application.Utils;
 using Domain.Factories.Accounts;
-using Domain.Models.Accounts;
-using Domain.Models.Users;
 using Domain.Repositories.Accounts;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
 
@@ -11,15 +9,15 @@ namespace Application.UseCase.Command.Accounts.CreateAccount
 {
     public class CreateAccountHandler : IRequestHandler<CreateAccountCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly IAccountFactory _accountFactory;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateAccountHandler(IAccountRepository accountRepository, IUserRepository userRepository, IAccountFactory accountFactory, IUnitOfWork unitOfWort)
+        public CreateAccountHandler(IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IAccountFactory accountFactory, IUnitOfWork unitOfWort)
         {
             _accountRepository = accountRepository;
-            _userRepository = userRepository;
+            _userProfileRepository = userProfileRepository;
             _accountFactory = accountFactory;
             _unitOfWork = unitOfWort;
         }
@@ -27,7 +25,7 @@ namespace Application.UseCase.Command.Accounts.CreateAccount
         public async Task<Result> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
 
-            var user = await _userRepository.FindByIdAsync(request.UserId!.Value);
+            var user = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
             if (user == null) return new Result(false, "User not found");
 
             var existingAccount = await _accountRepository.FindByNameAsync(user.Id, request.Name);

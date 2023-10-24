@@ -1,11 +1,7 @@
 ﻿using Application.Utils;
-using Domain.Events.Transactions;
-using Domain.Models.Accounts;
-using Domain.Models.Transactions;
-using Domain.Models.Users;
 using Domain.Repositories.Accounts;
 using Domain.Repositories.Transactions;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
 
@@ -13,30 +9,30 @@ namespace Application.UseCase.Command.Transactions.DeleteTransaction
 {
     public class DeleteTransactionHandler : IRequestHandler<DeleteTransactionCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteTransactionHandler(ITransactionRepository transactionRepository, IAccountRepository accountRepository, IUserRepository userRepository, IUnitOfWork unitOfWort)
+        public DeleteTransactionHandler(ITransactionRepository transactionRepository, IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IUnitOfWork unitOfWort)
         {
             _transactionRepository = transactionRepository;
             _accountRepository = accountRepository;
-            _userRepository = userRepository;
+            _userProfileRepository = userProfileRepository;
             _unitOfWork = unitOfWort;
         }
 
         public async Task<Result> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindByIdAsync(request.UserId!.Value);
-            if (user == null) return new Result(false, "User not found");
+            var userProfile = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
+            if (userProfile == null) return new Result(false, "User not found");
 
             var transaction = await _transactionRepository.FindByIdAsync(request.TransactionId);
             if (transaction == null)return new Result(false, "User Transaction not found");
            
             var account = await _accountRepository.FindByIdAsync(transaction.AccountId);
             if (account == null)return new Result(false, "User Acccount not found");           
-            if (account.UserId != request.UserId)return new Result(false, "The user is not the owner of this account");
+            if (account.UserProfileId != userProfile.Id)return new Result(false, "The user is not the owner of this account");
             
 
             var relatedTransactionId = transaction.RelatedTransactionId;

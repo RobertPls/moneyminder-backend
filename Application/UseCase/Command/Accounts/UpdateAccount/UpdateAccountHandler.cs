@@ -1,8 +1,6 @@
 ﻿using Application.Utils;
-using Domain.Models.Accounts;
-using Domain.Models.Users;
 using Domain.Repositories.Accounts;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
 
@@ -11,25 +9,25 @@ namespace Application.UseCase.Command.Accounts.UpdateAccount
 
     public class UpdateAccountHandler : IRequestHandler<UpdateAccountCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userUserProfileRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateAccountHandler(IAccountRepository accountRepository, IUserRepository userRepository, IUnitOfWork unitOfWort)
+        public UpdateAccountHandler(IAccountRepository accountRepository, IUserProfileRepository userUserProfileRepository, IUnitOfWork unitOfWort)
         {
             _accountRepository = accountRepository;
-            _userRepository = userRepository;
+            _userUserProfileRepository = userUserProfileRepository;
             _unitOfWork = unitOfWort;
         }
 
         public async Task<Result> Handle(UpdateAccountCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindByIdAsync(request.UserId!.Value);
-            if (user == null) return new Result(false, "User not found");
+            var userProfile = await _userUserProfileRepository.FindByUserIdAsync(request.UserId!.Value);
+            if (userProfile == null) return new Result(false, "User not found");
 
             var account = await _accountRepository.FindByIdAsync(request.AccountId);
             if (account == null)return new Result(false, "User Account not found");           
-            if (account.UserId != request.UserId) return new Result(false, "The user is not the owner of this account");           
+            if (account.UserProfileId != userProfile.Id) return new Result(false, "The user is not the owner of this account");           
 
             account.UpdateDescription(request.Description);
 

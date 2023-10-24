@@ -21,7 +21,7 @@ namespace Infrastructure.EntityFramework.Config.WriteConfig.Categories
             builder.Property(x => x.Name).HasColumnName("name").HasConversion(categoryNameConverter);
             builder.Property(x => x.IsDefault).HasColumnName("isDefault");
 
-            builder.Property(x => x.UserId).HasColumnName("userId");
+            builder.Property(x => x.UserProfileId).HasColumnName("userProfileId");
 
             builder.Ignore("_domainEvents");
             builder.Ignore(x => x.DomainEvents);

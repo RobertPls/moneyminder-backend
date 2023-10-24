@@ -17,7 +17,7 @@ namespace Infrastructure.Query.Categories.GetCategoryListByUserId
         }
         public async Task<Result<IEnumerable<CategoryDto>>> Handle(GetCategoryListByUserIdQuery request, CancellationToken cancellationToken)
         {
-            var query = category.Where(x => x.UserId == request.UserId).AsNoTracking().AsQueryable();
+            var query = category.Where(x => x.UserProfile.UserId == request.UserId).AsNoTracking().AsQueryable();
 
             var list = await query.Select(x => new CategoryDto
             {

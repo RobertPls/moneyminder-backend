@@ -27,7 +27,7 @@ namespace Infrastructure.EntityFramework.Config.WriteConfig.Accounts
             builder.Property(x => x.Description).HasColumnName("description").HasConversion(descriptionConverter);
             builder.Property(x => x.Balance).HasColumnName("balance").HasPrecision(38, 2);
 
-            builder.Property(x => x.UserId).HasColumnName("userId");
+            builder.Property(x => x.UserProfileId).HasColumnName("userProfileId");
 
             builder.Ignore("_domainEvents");
             builder.Ignore(x => x.DomainEvents);

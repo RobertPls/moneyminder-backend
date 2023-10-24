@@ -1,16 +1,14 @@
 ﻿using Application;
-using Domain.Factories.Users;
 using Domain.Repositories.Accounts;
 using Domain.Repositories.Categories;
 using Domain.Repositories.Transactions;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using Infrastructure.EntityFramework;
 using Infrastructure.EntityFramework.Context;
-using Infrastructure.EntityFramework.ReadModel.Users;
 using Infrastructure.EntityFramework.Repository.Accounts;
 using Infrastructure.EntityFramework.Repository.Categories;
 using Infrastructure.EntityFramework.Repository.Transactions;
-using Infrastructure.EntityFramework.Repository.Users;
+using Infrastructure.EntityFramework.Repository.UserProfiles;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +27,7 @@ namespace Infrastructure
         public static void AddSecurity(IServiceCollection services, IConfiguration configuration)
         {
 
-            services.AddIdentity<UserReadModel, ApplicationRole>(options =>
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequireLowercase = false;
@@ -87,7 +85,7 @@ namespace Infrastructure
             services.AddDbContext<WriteDbContext>(context => { context.UseSqlServer(connectionString); });
 
             services.AddHostedService<DbInitializer>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();

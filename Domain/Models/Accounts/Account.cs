@@ -1,12 +1,11 @@
 ﻿using Domain.ValueObjects;
 using SharedKernel.Core;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Domain.Models.Accounts
 {
     public class Account: AggregateRoot<Guid>
     {
-        public Guid UserId { get; private set; }
+        public Guid UserProfileId { get; private set; }
 
         public AccountNameValue Name { get; private set; }
 
@@ -14,15 +13,15 @@ namespace Domain.Models.Accounts
         
         public decimal Balance { get; private set; }
 
-        public Account(Guid userId, string name, string description) 
+        public Account(Guid userProfileId, string name, string description) 
         {
-            if (userId == Guid.Empty)
+            if (userProfileId == Guid.Empty)
             {
                 throw new BussinessRuleValidationException("The user cannot be empty");
             }
 
             Id = Guid.NewGuid();
-            UserId = userId;
+            UserProfileId = userProfileId;
             Name = name;
             Description = description;
             Balance = 0;

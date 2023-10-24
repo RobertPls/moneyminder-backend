@@ -1,5 +1,4 @@
-﻿using Infrastructure.EntityFramework.ReadModel.Users;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,11 +9,11 @@ namespace Infrastructure.Security
     public class SecurityInitializer
     {
         private readonly ILogger<SecurityInitializer> _logger;
-        private readonly UserManager<UserReadModel> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public SecurityInitializer(ILogger<SecurityInitializer> logger, UserManager<UserReadModel> userManager,
+        public SecurityInitializer(ILogger<SecurityInitializer> logger, UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
@@ -73,12 +72,12 @@ namespace Infrastructure.Security
             //Get User admin
             foreach (var userJson in initJsonObj.users)
             {
-                UserReadModel user = await _userManager.FindByNameAsync(userJson.userName.ToString());
+                ApplicationUser user = await _userManager.FindByNameAsync(userJson.userName.ToString());
 
                 foreach (var roleJson in userJson.userroles)
                 {
                     ApplicationRole identyRole = await RoleManager.FindByNameAsync(roleJson.role.ToString());
-                    IList<UserReadModel> usersInRole = await _userManager.GetUsersInRoleAsync(identyRole.Name);
+                    IList<ApplicationUser> usersInRole = await _userManager.GetUsersInRoleAsync(identyRole.Name);
 
                     if (!usersInRole.Any(x => x.Id == user.Id))
                     {
@@ -127,7 +126,7 @@ namespace Infrastructure.Security
                     continue;
                 }
 
-                UserReadModel user = null;
+                ApplicationUser user = null;
                 try
                 {
                     user = await _userManager.FindByNameAsync(userName);
@@ -142,7 +141,7 @@ namespace Infrastructure.Security
                 if (user == null)
                 {
                     // User doesnt exist so we create it
-                    user = new UserReadModel(userJson.userName.ToString(), userJson.firstName.ToString(), userJson.lastName.ToString(), userJson.email.ToString(), true, true);
+                    user = new ApplicationUser(userJson.userName.ToString(), userJson.firstName.ToString(), userJson.lastName.ToString(), userJson.email.ToString(), true, true);
 
                     IdentityResult userCreated = await _userManager.CreateAsync(user, userJson.password.ToString());
                     if (!userCreated.Succeeded)

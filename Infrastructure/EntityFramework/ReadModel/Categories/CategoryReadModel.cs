@@ -1,4 +1,4 @@
-﻿using Infrastructure.EntityFramework.ReadModel.Users;
+﻿using Infrastructure.EntityFramework.ReadModel.UserProfiles;
 using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.EntityFramework.ReadModel.Categories
@@ -8,8 +8,8 @@ namespace Infrastructure.EntityFramework.ReadModel.Categories
 
         [Key]
         public Guid Id { get; set; }
-        public UserReadModel User { get; set; }
-        public Guid UserId { get; set; }
+        public UserProfileReadModel UserProfile { get; set; }
+        public Guid UserProfileId { get; set; }
         public string Name { get; set; }
         public bool IsDefault { get; set; }
     }

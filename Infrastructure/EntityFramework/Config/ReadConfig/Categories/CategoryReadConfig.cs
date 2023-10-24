@@ -13,8 +13,8 @@ namespace Infrastructure.EntityFramework.Config.ReadConfig.Categories
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.Name).HasColumnName("name");
 
-            builder.Property(x => x.UserId).HasColumnName("userId");
-            builder.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
+            builder.Property(x => x.UserProfileId).HasColumnName("userProfileId");
+            builder.HasOne(x => x.UserProfile).WithMany().HasForeignKey(x => x.UserProfileId);
         }
     }
 }

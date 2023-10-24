@@ -1,21 +1,19 @@
 ﻿using Application.Utils;
 using Domain.Factories.Transactions;
-using Domain.Models.Accounts;
-using Domain.Models.Categories;
 using Domain.Models.Transactions;
-using Domain.Models.Users;
 using Domain.Repositories.Accounts;
 using Domain.Repositories.Categories;
+using Domain.Repositories.UserProfiles;
 using Domain.Repositories.Transactions;
-using Domain.Repositories.Users;
 using MediatR;
 using SharedKernel.Core;
+using Domain.Models.UserProfiles;
 
 namespace Application.UseCase.Command.Transactions.CreateTransaction
 {
     public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userUserProfileRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -24,14 +22,14 @@ namespace Application.UseCase.Command.Transactions.CreateTransaction
 
         public CreateTransactionHandler(
             ITransactionRepository transactionRepository,
-            IUserRepository userRepository,
+            IUserProfileRepository userUserProfileRepository,
             IAccountRepository accountRepository,
             ICategoryRepository categoryRepository,
             ITransactionFactory transactionFactory, 
             IUnitOfWork unitOfWort)
         {
             _transactionRepository = transactionRepository;
-            _userRepository = userRepository;
+            _userUserProfileRepository = userUserProfileRepository;
             _accountRepository = accountRepository;
             _categoryRepository = categoryRepository;
             _transactionFactory = transactionFactory;
@@ -40,16 +38,16 @@ namespace Application.UseCase.Command.Transactions.CreateTransaction
 
         public async Task<Result> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindByIdAsync(request.UserId!.Value);
-            if (user == null) return new Result(false, "User not found");
+            var userProfile = await _userUserProfileRepository.FindByUserIdAsync(request.UserId!.Value);
+            if (userProfile == null) return new Result(false, "User not found");
 
             var account = await _accountRepository.FindByIdAsync(request.AccountId);
             if (account == null)return new Result(false, "Account not found");
-            if (account.UserId != user.Id)return new Result(false, "The user is not the owner of this Account");            
+            if (account.UserProfileId != userProfile.Id)return new Result(false, "The user is not the owner of this Account");            
 
             var category = await _categoryRepository.FindByIdAsync(request.CategoryId);
             if (category == null) return new Result(false, "Category not found");        
-            if (category.UserId != user.Id)return new Result(false, "The user is not the owner of this Category");
+            if (category.UserProfileId != userProfile.Id)return new Result(false, "The user is not the owner of this Category");
             
 
             Transaction transaction = request.Type == Dto.Transactions.TransactionType.Income ?

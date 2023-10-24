@@ -1,14 +1,11 @@
 ﻿using Application.UseCase.Command.Transactions.CreateTransference;
 using Application.Utils;
 using Domain.Factories.Transactions;
-using Domain.Models.Accounts;
-using Domain.Models.Categories;
 using Domain.Models.Transactions;
-using Domain.Models.Users;
 using Domain.Repositories.Accounts;
 using Domain.Repositories.Categories;
 using Domain.Repositories.Transactions;
-using Domain.Repositories.Users;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
 
@@ -16,7 +13,7 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
 {
     public class CreateTransferenceHandler : IRequestHandler<CreateTransferenceCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -25,14 +22,14 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
 
         public CreateTransferenceHandler(
             ITransactionRepository transactionRepository,
-            IUserRepository userRepository,
+            IUserProfileRepository userProfileRepository,
             IAccountRepository accountRepository,
             ICategoryRepository categoryRepository,
             ITransactionFactory transactionFactory,
             IUnitOfWork unitOfWort)
         {
             _transactionRepository = transactionRepository;
-            _userRepository = userRepository;
+            _userProfileRepository = userProfileRepository;
             _accountRepository = accountRepository;
             _categoryRepository = categoryRepository;
             _transactionFactory = transactionFactory;
@@ -42,7 +39,7 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
         public async Task<Result> Handle(CreateTransferenceCommand request, CancellationToken cancellationToken)
         {
 
-            var user = await _userRepository.FindByIdAsync(request.UserId!.Value);
+            var user = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
             if (user == null) return new Result(false, "User not found");
 
 
@@ -53,7 +50,7 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
 
             if (originAccount == null || destinationAccount == null)return new Result(false, "Account not found");           
 
-            if (originAccount.UserId != user.Id || destinationAccount.UserId != user.Id) return new Result(false, "The user is not the owner of this Account");           
+            if (originAccount.UserProfileId != user.Id || destinationAccount.UserProfileId != user.Id) return new Result(false, "The user is not the owner of this Account");           
 
             Transaction transactionInOriginAccount = _transactionFactory.CreateOutcomeTransaction(request.OriginAccountId, null, request.Date, request.Amount, "Transference");
 

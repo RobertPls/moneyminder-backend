@@ -1,11 +1,9 @@
 ﻿using Domain.Events.Transactions;
 using Domain.Factories.Accounts;
-using Domain.Models.Accounts;
 using Domain.Models.Transactions;
 using Domain.Repositories.Accounts;
 using MediatR;
 using SharedKernel.Core;
-using System.Security.Principal;
 
 namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
 {

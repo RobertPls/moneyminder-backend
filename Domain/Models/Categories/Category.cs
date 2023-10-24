@@ -5,20 +5,20 @@ namespace Domain.Models.Categories
 {
     public class Category : AggregateRoot<Guid>
     {
-        public Guid UserId { get; private set; }
+        public Guid UserProfileId { get; private set; }
         public CategoryNameValue Name { get; private set; }
         public bool IsDefault{ get; private set; }
 
 
-        public Category(Guid userId, string name, bool isDefault) 
+        public Category(Guid userProfileId, string name, bool isDefault) 
         {
-            if (userId == Guid.Empty)
+            if (userProfileId == Guid.Empty)
             {
                 throw new BussinessRuleValidationException("The user cannot be empty");
             }
 
             Id = Guid.NewGuid();
-            UserId = userId;
+            UserProfileId = userProfileId;
             Name = name;
             IsDefault = isDefault;
         }
