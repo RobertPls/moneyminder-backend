@@ -39,7 +39,7 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
         public async Task<Result> Handle(CreateTransferenceCommand request, CancellationToken cancellationToken)
         {
 
-            var user = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
+            var user = await _userProfileRepository.FindByUserIdAsync(request.UserId!.Value);
             if (user == null) return new Result(false, "User not found");
 
 
@@ -52,9 +52,9 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
 
             if (originAccount.UserProfileId != user.Id || destinationAccount.UserProfileId != user.Id) return new Result(false, "The user is not the owner of this Account");           
 
-            Transaction transactionInOriginAccount = _transactionFactory.CreateOutcomeTransaction(request.OriginAccountId, null, request.Date, request.Amount, "Transference");
+            Transaction transactionInOriginAccount = _transactionFactory.CreateOutcomeTransaction(request.OriginAccountId, null, request.Date, request.Amount, "Transference", true);
 
-            Transaction transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(request.DestinationAccountId, null, request.Date, request.Amount, "Transference");
+            Transaction transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(request.DestinationAccountId, null, request.Date, request.Amount, "Transference", true);
 
             transactionInOriginAccount.AddTransacionRelation(transactionInDestinationAccount.Id);
 

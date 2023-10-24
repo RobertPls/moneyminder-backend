@@ -5,12 +5,12 @@ namespace Application.UseCase.Command.Security.Login
 {
     public record LoginCommand : IRequest<Result<string>>
     {
-        public string username { get; set; }
+        public string email { get; set; }
         public string password { get; set; }
 
-        public LoginCommand(string username, string password)
+        public LoginCommand(string email, string password)
         {
-            this.username = username;
+            this.email = email;
             this.password = password;
         }
     }

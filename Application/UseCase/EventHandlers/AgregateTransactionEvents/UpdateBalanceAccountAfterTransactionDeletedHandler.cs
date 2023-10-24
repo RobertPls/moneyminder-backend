@@ -31,14 +31,17 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
 
             if (notification.Type == TransactionType.Income)
             {
-                account.DecreaseBalance(notification.Amount);
+                account.DecreaseBalance(notification.Amount, notification.IsTransference);
             }
             else
             {
-                account.IncreaseBalance(notification.Amount);
+                account.IncreaseBalance(notification.Amount, notification.IsTransference);
             }
 
             await _accountRepository.UpdateAsync(account);
+
+            await _unitOfWork.Commit();
+
         }
     }
 }

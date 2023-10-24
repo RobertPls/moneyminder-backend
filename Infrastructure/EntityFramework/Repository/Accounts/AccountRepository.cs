@@ -24,7 +24,11 @@ namespace Infrastructure.EntityFramework.Repository.Accounts
 
         public async Task<Account?> FindByNameAsync(Guid id, string name)
         {
-            return await _context.Account.FirstOrDefaultAsync(x => x.Name.ToString().ToLower() == name.ToLower() && x.UserProfileId ==id);
+            var accounts = await _context.Account
+                .Where(x => x.UserProfileId == id)
+                .ToListAsync();
+
+            return accounts.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
         public Task RemoveAsync(Account obj)

@@ -28,9 +28,9 @@ namespace Infrastructure.Query.Transactions.GetFilteredUserTransactionList
             var list = await query.Select(x => new TransactionDto
             {
                 Id = x.Id,
-                RelatedTransactionId = x.RelatedTransactionId,
-                AccountId = x.Account.Id,
-                CategoryId = x.CategoryId,
+                RelatedTransaction = x.RelatedTransaction.Account.Name,
+                Account = x.Account.Name,
+                Category = x.Category.Name,
                 Description = x.Description,
                 Amount = x.Amount,
                 Date = x.Date,

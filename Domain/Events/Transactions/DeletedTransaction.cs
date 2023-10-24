@@ -8,13 +8,14 @@ namespace Domain.Events.Transactions
         public Guid AccountId { get; set; }
         public decimal Amount { get; set; }
         public TransactionType Type { get; set; }
+        public bool IsTransference { get; set; }
 
-
-        public DeletedTransaction(Guid accountId, decimal amount, TransactionType type) : base(DateTime.Now)
+        public DeletedTransaction(Guid accountId, decimal amount, TransactionType type, bool isTransference) : base(DateTime.Now)
         {
             AccountId = accountId;
             Amount = amount;
             Type = type;
+            IsTransference = isTransference;
         }
     }
 }

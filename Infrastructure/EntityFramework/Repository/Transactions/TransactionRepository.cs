@@ -26,7 +26,6 @@ namespace Infrastructure.EntityFramework.Repository.Transactions
         public Task RemoveAsync(Transaction obj)
         {
             _context.Transaction.Remove(obj);
-            obj.Deleted();
             return Task.CompletedTask;
         }
 

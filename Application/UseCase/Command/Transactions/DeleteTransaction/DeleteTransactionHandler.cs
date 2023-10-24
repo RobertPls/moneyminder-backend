@@ -24,7 +24,7 @@ namespace Application.UseCase.Command.Transactions.DeleteTransaction
 
         public async Task<Result> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
         {
-            var userProfile = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
+            var userProfile = await _userProfileRepository.FindByUserIdAsync(request.UserId!.Value);
             if (userProfile == null) return new Result(false, "User not found");
 
             var transaction = await _transactionRepository.FindByIdAsync(request.TransactionId);
@@ -52,12 +52,27 @@ namespace Application.UseCase.Command.Transactions.DeleteTransaction
 
                 await _unitOfWork.Commit();
 
+                relatedTransaction.Deleted(true);
+
+                transaction.Deleted(true);
+
                 await _transactionRepository.RemoveAsync(relatedTransaction);
+                
+                await _transactionRepository.RemoveAsync(transaction);
+
+
+                await _unitOfWork.Commit();
+            }
+            else
+            {
+                await _transactionRepository.RemoveAsync(transaction);
+
+                transaction.Deleted(false);
+
+                await _unitOfWork.Commit();
             }
 
-            await _transactionRepository.RemoveAsync(transaction);
-           
-            await _unitOfWork.Commit();
+
 
             return new Result(true, "Transaction has been deleted");
 

@@ -12,7 +12,6 @@ public static class Program
             IWebHostEnvironment env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             SecurityInitializer securityInitializer = scope.ServiceProvider.GetRequiredService<SecurityInitializer>();
 
-            ConfigureLogs(env);
 
             string contentRootPath = env.ContentRootPath;
             var permissionJsonFilePath = contentRootPath + "/DataFiles/permissions.json";
@@ -34,15 +33,5 @@ public static class Program
                webBuilder.UseStartup<Startup>();
            });
 
-
-    private static void ConfigureLogs(IWebHostEnvironment env)
-    {
-        if (env.IsDevelopment())
-        {
-            //var log = new LoggerConfiguration()
-            //    .WriteTo.Console()
-            //    .CreateLogger();
-        }
-    }
 }
 

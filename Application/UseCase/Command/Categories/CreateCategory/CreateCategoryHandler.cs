@@ -31,7 +31,7 @@ namespace Application.UseCase.Command.Categories.CreateCategory
             var existingCategory = await _categoryRepository.FindByNameAsync(userProfile.Id, request.Name);
             if (existingCategory != null) return new Result(false, "A category with the same name already exists.");
 
-            var category = _categoryFactory.Create(userId: request.UserId!.Value,name: request.Name,isDefault: false);
+            var category = _categoryFactory.Create(userProfile.Id, request.Name, false);
 
             await _categoryRepository.CreateAsync(category);
 

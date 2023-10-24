@@ -1,6 +1,6 @@
 ﻿namespace Application.Dto.Users
 {
-    internal class UserDto
+    public class UserProfileDto
     {
         public Guid Id { get; set; }
         public string FullName { get; set; }

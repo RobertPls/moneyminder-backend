@@ -51,8 +51,8 @@ namespace Application.UseCase.Command.Transactions.CreateTransaction
             
 
             Transaction transaction = request.Type == Dto.Transactions.TransactionType.Income ?
-                _transactionFactory.CreateIncomeTransaction(request.AccountId, request.CategoryId, request.Date, request.Amount, request.Description) :
-                _transactionFactory.CreateOutcomeTransaction(request.AccountId, request.CategoryId, request.Date, request.Amount, request.Description);
+                _transactionFactory.CreateIncomeTransaction(request.AccountId, request.CategoryId, request.Date, request.Amount, request.Description, false) :
+                _transactionFactory.CreateOutcomeTransaction(request.AccountId, request.CategoryId, request.Date, request.Amount, request.Description, false);
 
             await _transactionRepository.CreateAsync(transaction);
 

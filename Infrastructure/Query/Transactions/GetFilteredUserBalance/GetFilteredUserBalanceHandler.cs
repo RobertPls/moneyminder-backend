@@ -35,8 +35,6 @@ namespace Infrastructure.Query.Transactions.GetFilteredUserBalance
 
             decimal balance = totalIncome - totalOutcome;
 
-            System.Diagnostics.Debug.WriteLine(query.Count());
-
             var balanceDto = new BalanceDto
             {
                 Income = totalIncome,

@@ -27,7 +27,10 @@ namespace Application.UseCase.Command.Accounts.UpdateAccount
 
             var account = await _accountRepository.FindByIdAsync(request.AccountId);
             if (account == null)return new Result(false, "User Account not found");           
-            if (account.UserProfileId != userProfile.Id) return new Result(false, "The user is not the owner of this account");           
+            if (account.UserProfileId != userProfile.Id) return new Result(false, "The user is not the owner of this account");
+
+            var existingAccount = await _accountRepository.FindByNameAsync(userProfile.Id, request.Name);
+            if (existingAccount != null) return new Result(false, "An account with the same name already exists.");
 
             account.UpdateDescription(request.Description);
 

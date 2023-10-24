@@ -25,13 +25,13 @@ namespace Application.UseCase.Command.Accounts.CreateAccount
         public async Task<Result> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
 
-            var user = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
-            if (user == null) return new Result(false, "User not found");
+            var userProfile = await _userProfileRepository.FindByUserIdAsync(request.UserId!.Value);
+            if (userProfile == null) return new Result(false, "User not found");
 
-            var existingAccount = await _accountRepository.FindByNameAsync(user.Id, request.Name);
+            var existingAccount = await _accountRepository.FindByNameAsync(userProfile.Id, request.Name);
             if (existingAccount != null)return new Result(false, "An account with the same name already exists.");
 
-            var account = _accountFactory.Create(userId: request.UserId!.Value,name: request.Name,descripcion: request.Description);
+            var account = _accountFactory.Create(userProfile.Id,request.Name,request.Description);
 
             await _accountRepository.CreateAsync(account);
 

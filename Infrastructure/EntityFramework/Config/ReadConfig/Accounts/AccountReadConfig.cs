@@ -12,7 +12,6 @@ namespace Infrastructure.EntityFramework.Config.ReadConfig.Accounts
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.Name).HasColumnName("name");
-            builder.HasIndex(x => x.Name).IsUnique();
             builder.Property(x => x.Description).HasColumnName("description");
             builder.Property(x => x.Balance).HasColumnName("balance").HasPrecision(38, 2);
 

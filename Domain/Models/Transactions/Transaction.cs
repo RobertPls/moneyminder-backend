@@ -82,13 +82,13 @@ namespace Domain.Models.Transactions
             CategoryId = newCategoryId;
         }
 
-        public void Updated(Guid oldAccountId,Guid newAccountId,decimal oldAmount,decimal newAmount,TransactionType oldType,TransactionType newType)
+        public void Updated(Guid oldAccountId,Guid newAccountId,decimal oldAmount,decimal newAmount,TransactionType oldType,TransactionType newType, bool isTransfer)
         {
-            AddDomainEvent(new UpdatedTransaction(oldAccountId, newAccountId, oldAmount, newAmount, oldType, newType));
+            AddDomainEvent(new UpdatedTransaction(oldAccountId, newAccountId, oldAmount, newAmount, oldType, newType , isTransfer));
         }
-        public void Deleted()
+        public void Deleted(bool isTransference)
         {
-            AddDomainEvent(new DeletedTransaction(AccountId, Amount, Type));
+            AddDomainEvent(new DeletedTransaction(AccountId, Amount, Type, isTransference));
         }
     }
 }

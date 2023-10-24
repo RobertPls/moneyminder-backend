@@ -22,7 +22,7 @@ namespace Application.UseCase.Command.Categories.DeleteCategory
 
         public async Task<Result> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
-            var userProfile = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
+            var userProfile = await _userProfileRepository.FindByUserIdAsync(request.UserId!.Value);
             if (userProfile == null) return new Result(false, "User not found");            
 
             var category = await _categoryRepository.FindByIdAsync(request.CategoryId);

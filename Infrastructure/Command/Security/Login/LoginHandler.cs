@@ -30,28 +30,28 @@ namespace Infrastructure.Command.Security.Login
 
         public async Task<Result<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByNameAsync(request.username);
-            _logger.LogInformation("{request.username} is trying to login", request.username);
+            var user = await _userManager.FindByNameAsync(request.email);
+            _logger.LogInformation("{request.username} is trying to login", request.email);
             if (user == null)
             {
-                _logger.LogWarning("Username {request.username} is not registered", request.username);
-                user = await _userManager.FindByEmailAsync(request.username);
+                _logger.LogWarning("Username {request.username} is not registered", request.email);
+                user = await _userManager.FindByEmailAsync(request.email);
                 if (user == null)
                 {
-                    _logger.LogWarning("Email {request.email} is not registered", request.username);
+                    _logger.LogWarning("Email {request.email} is not registered", request.email);
                     return new Result<string>(false, "User not found");
                 }
             }
 
             if (!user.Active)
             {
-                _logger.LogWarning("{request.username} is not active", request.username);
+                _logger.LogWarning("{request.username} is not active", request.email);
                 return new Result<string>(false, "User is not active");
             }
             var signInResult = await _signInManager.PasswordSignInAsync(user, request.password, false, true);
             if (signInResult.Succeeded)
             {
-                _logger.LogInformation("{request.username} has logged in", request.username);
+                _logger.LogInformation("{request.username} has logged in", request.email);
                 var jwt = await GenerateJwt(user);
                 return new Result<string>(jwt, true, "User has logged in");
             }

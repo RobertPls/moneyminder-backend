@@ -37,7 +37,7 @@ namespace Web.Controllers
             }
             else
             {
-                return Unauthorized();
+                return Unauthorized(new { result });
             }
         }
 
@@ -57,7 +57,7 @@ namespace Web.Controllers
             }
             else
             {
-                return Unauthorized();
+                return Unauthorized(new { result });
             }
         }
     }

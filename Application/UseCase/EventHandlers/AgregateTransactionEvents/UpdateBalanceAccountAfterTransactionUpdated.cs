@@ -31,43 +31,46 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
                 throw new NullReferenceException("User account is null, it's not possible to update its balance.");
             }
 
-            if(oldAccount.Id == newAccount.Id && notification.OldType == notification.NewType && notification.OldType == notification.NewType)
+            if(oldAccount.Id == newAccount.Id && notification.OldType == notification.NewType)
             {
                 if (notification.NewType == TransactionType.Income)
                 {
-                    newAccount.DecreaseBalance(notification.OldAmount);
-                    newAccount.IncreaseBalance(notification.NewAmount);
+                    newAccount.DecreaseBalance(notification.OldAmount, notification.IsTransference);
+                    newAccount.IncreaseBalance(notification.NewAmount, notification.IsTransference);
                 }
                 else
                 {
-                    newAccount.IncreaseBalance(notification.OldAmount);
-                    newAccount.DecreaseBalance(notification.NewAmount);
+                    newAccount.IncreaseBalance(notification.OldAmount, notification.IsTransference);
+                    newAccount.DecreaseBalance(notification.NewAmount, notification.IsTransference);
                 }
             }
             else
             {
                 if (notification.OldType == TransactionType.Income)
                 {
-                    oldAccount.DecreaseBalance(notification.OldAmount);
+                    oldAccount.DecreaseBalance(notification.OldAmount, notification.IsTransference);
                 }
                 else
                 {
-                    oldAccount.IncreaseBalance(notification.OldAmount);
+                    oldAccount.IncreaseBalance(notification.OldAmount, notification.IsTransference);
                 }
 
                 if (notification.NewType == TransactionType.Income)
                 {
-                    newAccount.IncreaseBalance(notification.NewAmount);
+                    newAccount.IncreaseBalance(notification.NewAmount, notification.IsTransference);
                 }
                 else
                 {
-                    newAccount.DecreaseBalance(notification.NewAmount);
+                    newAccount.DecreaseBalance(notification.NewAmount, notification.IsTransference);
                 }
             }
 
 
             await _accountRepository.UpdateAsync(oldAccount);
             await _accountRepository.UpdateAsync(newAccount);
+
+            await _unitOfWork.Commit();
+
         }
     }
 }

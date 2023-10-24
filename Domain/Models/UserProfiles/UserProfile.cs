@@ -11,9 +11,14 @@ namespace Domain.Models.UserProfiles
         public decimal Balance { get; private set; }
 
 
-        internal UserProfile(Guid userId, string fullName)
+        public UserProfile(Guid userId, string fullName)
         {
+            if (userId == Guid.Empty)
+            {
+                throw new BussinessRuleValidationException("The user cannot be empty");
+            }
             Id = Guid.NewGuid();
+            UserId = userId;
             FullName = fullName;
             Balance = 0;
         }

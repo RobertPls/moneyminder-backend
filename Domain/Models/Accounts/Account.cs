@@ -1,4 +1,5 @@
-﻿using Domain.ValueObjects;
+﻿using Domain.Events.Accounts;
+using Domain.ValueObjects;
 using SharedKernel.Core;
 
 namespace Domain.Models.Accounts
@@ -29,18 +30,28 @@ namespace Domain.Models.Accounts
 
         public Account() { }
 
-        public void IncreaseBalance(decimal amount)
+        public void IncreaseBalance(decimal amount, bool isTransference)
         {
             MoneyValue amountMoney = new MoneyValue(amount);
 
             Balance = Balance + amountMoney;
+
+            if(isTransference == false)
+            {
+                AddDomainEvent(new IncreasedAccountBalance(Id, amount));
+            }
         }
 
-        public void DecreaseBalance(decimal amount)
+        public void DecreaseBalance(decimal amount, bool isTransference)
         {
             MoneyValue amountMoney = new MoneyValue(amount);
 
             Balance = Balance - amountMoney;
+
+            if (isTransference == false)
+            {
+                AddDomainEvent(new DecreasedAccountBalance(Id, amount));
+            }
         }
 
         public void UpdateName(string name)

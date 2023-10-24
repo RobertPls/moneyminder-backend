@@ -32,7 +32,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
         public async Task<Result> Handle(UpdateTransactionCommand request, CancellationToken cancellationToken)
         {
 
-            var userProfile = await _userProfileRepository.FindByIdAsync(request.UserId??Guid.Empty);
+            var userProfile = await _userProfileRepository.FindByUserIdAsync(request.UserId??Guid.Empty);
             if (userProfile == null) return new Result(false, "User not found");
 
             var transaction = await _transactionRepository.FindByIdAsync(request.TransactionId);
@@ -90,7 +90,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             transaction.UpdateAmout(request.Amount);
             transaction.UpdateCategory(newCategory.Id);
             transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type);
+            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type, false);
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -110,7 +110,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             if (destinationAccount == null) return new Result(false, "Destination Account not found");
             if (destinationAccount.UserProfileId != userProfile) return new Result(false, "The user is not the owner of this destination Account");
 
-            var transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(destinationAccount.Id, null, request.Date, request.Amount, "Transference");
+            var transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(destinationAccount.Id, null, request.Date, request.Amount, "Transference", true);
             
             transactionInDestinationAccount.AddTransacionRelation(transaction.Id);
 
@@ -131,7 +131,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             transaction.UpdateAmout(request.Amount);
             transaction.RemoveCategoryRelation();
             transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type);
+            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type, true);
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -172,7 +172,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             transaction.UpdateAmout(request.Amount);
             transaction.UpdateCategory(newCategory.Id);
             transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type);
+            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type, false);
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -207,7 +207,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             transaction.UpdateAmout(request.Amount);
             transaction.RemoveCategoryRelation();
             transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type);
+            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type, true);
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -224,7 +224,7 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             relatedTransaction.UpdateAmout(request.Amount);
             relatedTransaction.RemoveCategoryRelation();
             relatedTransaction.UpdateAccount(destinationAccount.Id);
-            relatedTransaction.Updated(oldAccountIdRelatedTransaction, relatedTransaction.AccountId, oldAmountRelatedTransaction, relatedTransaction.Amount, oldTypeRelatedTransaction, relatedTransaction.Type);
+            relatedTransaction.Updated(oldAccountIdRelatedTransaction, relatedTransaction.AccountId, oldAmountRelatedTransaction, relatedTransaction.Amount, oldTypeRelatedTransaction, relatedTransaction.Type, true);
 
             await _transactionRepository.UpdateAsync(relatedTransaction);
 

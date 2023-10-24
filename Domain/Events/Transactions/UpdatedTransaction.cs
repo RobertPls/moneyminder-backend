@@ -12,8 +12,9 @@ namespace Domain.Events.Transactions
         public decimal NewAmount { get; private set; }
         public TransactionType OldType { get; private set; }
         public TransactionType NewType { get; private set; }
+        public bool IsTransference { get; private set; }
 
-        public UpdatedTransaction(Guid oldAccount, Guid newAccount, decimal oldAmmount, decimal newAmmount, TransactionType oldType, TransactionType newType) : base(DateTime.Now)
+        public UpdatedTransaction(Guid oldAccount, Guid newAccount, decimal oldAmmount, decimal newAmmount, TransactionType oldType, TransactionType newType, bool isTransference) : base(DateTime.Now)
         {
             OldAccountId = oldAccount;
             NewAccountId = newAccount;
@@ -21,6 +22,7 @@ namespace Domain.Events.Transactions
             NewAmount = newAmmount;
             OldType = oldType;
             NewType = newType;
+            IsTransference = isTransference;
         }
     }
 }

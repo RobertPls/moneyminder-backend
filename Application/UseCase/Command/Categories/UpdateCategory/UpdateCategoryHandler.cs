@@ -21,12 +21,15 @@ namespace Application.UseCase.Command.Categories.UpdateCategory
 
         public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
-            var userProfile = await _userProfileRepository.FindByIdAsync(request.UserId!.Value);
+            var userProfile = await _userProfileRepository.FindByUserIdAsync(request.UserId!.Value);
             if (userProfile == null)return new Result(false, "User not found");          
 
             var category = await _categoryRepository.FindByIdAsync(request.CategoryId);
             if (category == null)return new Result(false, "User Category not found");           
-            if (category.UserProfileId != userProfile.Id)return new Result(false, "The user is not the owner of this category");           
+            if (category.UserProfileId != userProfile.Id)return new Result(false, "The user is not the owner of this category");
+
+            var existingCategory = await _categoryRepository.FindByNameAsync(userProfile.Id, request.Name);
+            if (existingCategory != null) return new Result(false, "A category with the same name already exists.");
 
             category.UpdateName(request.Name);
 

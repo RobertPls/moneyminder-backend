@@ -21,8 +21,12 @@ namespace Application.UseCase.Consumers.Accounts
 
         public async Task Handle(CreatedUserProfile notification, CancellationToken cancellationToken)
         {
+            System.Diagnostics.Debug.WriteLine("asdasdasd+asdasdasd+asd+asd+as+das+das+da+sd+asd+asd" + notification.UserProfileId);
+
             var account = _accountFactory.Create(notification.UserProfileId, "Billetera", "Dinero Fisico");
             await _accountRepository.CreateAsync(account);
+
+            await _unitOfWork.Commit();
         }
     }
 }

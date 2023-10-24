@@ -29,6 +29,7 @@ namespace Infrastructure
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
@@ -85,6 +86,7 @@ namespace Infrastructure
             services.AddDbContext<WriteDbContext>(context => { context.UseSqlServer(connectionString); });
 
             services.AddHostedService<DbInitializer>();
+
             services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();

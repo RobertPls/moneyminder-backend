@@ -1,5 +1,6 @@
 ﻿using Application.UseCase.Command.Security.Register;
 using Application.Utils;
+using Domain.Events.UserProfiles;
 using Domain.Factories.UserProfiles;
 using Domain.Repositories.UserProfiles;
 using Infrastructure.Security;
@@ -17,15 +18,17 @@ namespace Infrastructure.Command.Security.Register
 
         private readonly IUserProfileFactory _userProfileFactory;
         private readonly IUserProfileRepository _userProfileRepository;
+        private readonly IMediator _mediator;
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public RegisterHandler(UserManager<ApplicationUser> userManager,IUserProfileRepository userProfileRepository, IUserProfileFactory userProfileFactory, ILogger<RegisterHandler> logger, IUnitOfWork unitOfWort)
+        public RegisterHandler(UserManager<ApplicationUser> userManager,IMediator mediator, IUserProfileRepository userProfileRepository, IUserProfileFactory userProfileFactory, ILogger<RegisterHandler> logger, IUnitOfWork unitOfWort)
         {
             _userManager = userManager;
             _userProfileFactory = userProfileFactory;
             _userProfileRepository = userProfileRepository;
             _logger = logger;
+            _mediator = mediator;
             _unitOfWork = unitOfWort;
         }
 
@@ -54,12 +57,16 @@ namespace Infrastructure.Command.Security.Register
                     {
                         await _userManager.AddToRolesAsync(newUser, rol );
 
-                        var userUserProfile = _userProfileFactory.Create(newUser.Id, newUser.FullName);
+                        var userProfile = _userProfileFactory.Create(newUser.Id, newUser.FullName);
 
-                        await _userProfileRepository.CreateAsync(userUserProfile);
+                        await _userProfileRepository.CreateAsync(userProfile);
                         
                         await _unitOfWork.Commit();
+
+                        var domainEvent = new CreatedUserProfile(userProfile.Id);
                         
+                        await _mediator.Publish(domainEvent);
+
                         return new Result(true, "User created");
                     }
                     else
