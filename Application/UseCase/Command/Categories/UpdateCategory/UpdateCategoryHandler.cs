@@ -31,7 +31,7 @@ namespace Application.UseCase.Command.Categories.UpdateCategory
             var existingCategory = await _categoryRepository.FindByNameAsync(userProfile.Id, request.Name);
             if (existingCategory != null) return new Result(false, "A category with the same name already exists.");
 
-            category.UpdateName(request.Name);
+            category.UpdateCategory(request.Name);
 
             await _categoryRepository.UpdateAsync(category);
 

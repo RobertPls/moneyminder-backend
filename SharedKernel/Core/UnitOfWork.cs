@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharedKernel.Core
+﻿namespace SharedKernel.Core
 {
     public interface IUnitOfWork
     {
         Task Commit();
+        void RemoveEvent(DomainEvent eventToRemove, Entity<Guid> entity);
     }
 }

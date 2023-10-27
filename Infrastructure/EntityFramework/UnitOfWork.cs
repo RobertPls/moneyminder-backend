@@ -29,5 +29,11 @@ namespace Infrastructure.EntityFramework
             }
             await _context.SaveChangesAsync();
         }
+
+        public void RemoveEvent(DomainEvent eventToRemove, Entity<Guid> entity)
+        {
+            entity.RemoveEvent(eventToRemove);
+        }
+
     }
 }

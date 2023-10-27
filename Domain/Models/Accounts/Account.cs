@@ -1,4 +1,5 @@
 ﻿using Domain.Events.Accounts;
+using Domain.Models.Transactions;
 using Domain.ValueObjects;
 using SharedKernel.Core;
 
@@ -30,38 +31,32 @@ namespace Domain.Models.Accounts
 
         public Account() { }
 
-        public void IncreaseBalance(decimal amount, bool isTransference)
-        {
-            MoneyValue amountMoney = new MoneyValue(amount);
-
-            Balance = Balance + amountMoney;
-
-            if(isTransference == false)
-            {
-                AddDomainEvent(new IncreasedAccountBalance(Id, amount));
-            }
-        }
-
-        public void DecreaseBalance(decimal amount, bool isTransference)
-        {
-            MoneyValue amountMoney = new MoneyValue(amount);
-
-            Balance = Balance - amountMoney;
-
-            if (isTransference == false)
-            {
-                AddDomainEvent(new DecreasedAccountBalance(Id, amount));
-            }
-        }
-
-        public void UpdateName(string name)
+        public void UpdateAccount(string name, string description)
         {
             Name = name;
+            Description = description;
+
         }
 
-        public void UpdateDescription(string description)
+        public void UpdateBalance(decimal amount, TransactionType type, bool isTransfer)
         {
-            Description = description;
+            MoneyValue amountMoney = new MoneyValue(amount);
+
+            if(!isTransfer)
+            {
+                AddDomainEvent(new UpdatedAccountBalance(Id, amount, type));
+            }
+
+            if (type == TransactionType.Income)
+            {
+                Balance = Balance + amountMoney.Value;
+            }
+            else
+            {
+                Balance = Balance - amountMoney;
+            }
+
         }
+
     }
 }

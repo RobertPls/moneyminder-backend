@@ -35,7 +35,6 @@ namespace Application.UseCase.EventHandlers.AggregateUserEvents
             await _categoryRepository.CreateAsync(categoryHealth);
             await _categoryRepository.CreateAsync(categoryTravel);
 
-            await _unitOfWork.Commit();
         }
     }
 }

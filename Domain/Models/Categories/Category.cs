@@ -25,7 +25,7 @@ namespace Domain.Models.Categories
 
         public Category() { }
 
-        public void UpdateName(string name)
+        public void UpdateCategory(string name)
         {
             Name = name;
         }

@@ -8,16 +8,15 @@ namespace Domain.Events.Transactions
         public Guid AccountId { get; set; }
         public decimal Amount { get; set; }
         public TransactionType Type { get; set; }
+        public bool IsTransfer { get; set; }
 
-        public bool IsTransference { get; set; }
 
-
-        public CreatedTransaction(Guid accountId, decimal amount, TransactionType type, bool isTransference) : base(DateTime.Now)
+        public CreatedTransaction( Guid accountId, decimal amount, TransactionType type, bool isTransfer) : base(DateTime.Now)
         {
             AccountId = accountId;
             Amount = amount;
             Type = type;
-            IsTransference = isTransference;
+            IsTransfer = isTransfer;
         }
     }
 }

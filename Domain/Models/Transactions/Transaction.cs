@@ -34,61 +34,53 @@ namespace Domain.Models.Transactions
         }
 
         public Transaction() { }
-        public void RemoveTransacionRelation()
-        {
-            RelatedTransactionId = null;
-        }
-        public void RemoveCategoryRelation()
-        {
-            CategoryId = null;
-        }
-        public void AddTransacionRelation(Guid transactionId)
-        {
-            RelatedTransactionId = transactionId;
-        }
 
-        public void AddCategoryRelation(Guid categoryId)
+        public void Update(string description, decimal amount, DateTime date, Guid accountId, Guid? categoryId, Guid? relatedTransactionId, TransactionType type, bool isTransference)
         {
-            CategoryId = categoryId;
-        }
-
-        public void UpdateDate(DateTime newDate)
-        {
-            Date = new DateValue(newDate);
-        }
-        public void UpdateAmout(decimal newAmount)
-        {
-            Amount = new MoneyValue(newAmount);
-        }
-        public void UpdateDescription(string newDescription)
-        {
-            Description = new DescriptionValue(newDescription); ;
-        }
-        public void UpdateType(TransactionType newType)
-        {
-            Type = newType;
-        }
-
-        public void UpdateAccount(Guid newAccountId)
-        {
-            if (newAccountId == Guid.Empty)
+            if (accountId == Guid.Empty)
             {
                 throw new BussinessRuleValidationException("The account cannot be empty");
             }
-            AccountId = newAccountId;
-        }
-        public void UpdateCategory(Guid newCategoryId)
-        {
-            CategoryId = newCategoryId;
+
+            var oldType = Type;
+            var oldAccount = AccountId;
+            var oldAmount = Amount;
+
+            CategoryId = categoryId;
+            RelatedTransactionId = relatedTransactionId;
+            AccountId = accountId;
+            Description = new DescriptionValue(description);
+            Date = new DateValue(date);
+            Amount = new MoneyValue(amount);
+            Type = type;
+
+            AddDomainEvent(new UpdatedTransaction(oldAccount, accountId, oldAmount, amount, oldType, type ,isTransference));
+
         }
 
-        public void Updated(Guid oldAccountId,Guid newAccountId,decimal oldAmount,decimal newAmount,TransactionType oldType,TransactionType newType, bool isTransfer)
+        public void DeleteTransaction(bool isTransfer)
         {
-            AddDomainEvent(new UpdatedTransaction(oldAccountId, newAccountId, oldAmount, newAmount, oldType, newType , isTransfer));
+            RemoveTransferenceRelation(); 
+
+            if(Type == TransactionType.Income)
+            {
+                Type = TransactionType.Outcome;
+            }
+            else
+            {
+                Type = TransactionType.Income;
+            }
+            AddDomainEvent(new DeletedTransaction(AccountId, Amount, Type, isTransfer));
         }
-        public void Deleted(bool isTransference)
+
+        public void RemoveTransferenceRelation()
         {
-            AddDomainEvent(new DeletedTransaction(AccountId, Amount, Type, isTransference));
+            RelatedTransactionId = null;
+        }
+
+        public void AddTransferenceRelation(Guid id)
+        {
+            RelatedTransactionId = id;
         }
     }
 }

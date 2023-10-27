@@ -32,9 +32,7 @@ namespace Application.UseCase.Command.Accounts.UpdateAccount
             var existingAccount = await _accountRepository.FindByNameAsync(userProfile.Id, request.Name);
             if (existingAccount != null) return new Result(false, "An account with the same name already exists.");
 
-            account.UpdateDescription(request.Description);
-
-            account.UpdateName(request.Name);
+            account.UpdateAccount(request.Name, request.Description);
 
             await _accountRepository.UpdateAsync(account);
 

@@ -29,6 +29,11 @@ namespace SharedKernel.Core
             _domainEvents.Clear();
         }
 
+        public void RemoveEvent(DomainEvent eventToRemove)
+        {
+            _domainEvents.Remove(eventToRemove);
+        }
+
         protected void CheckRule(IBussinessRule rule)
         {
             if(rule is null)

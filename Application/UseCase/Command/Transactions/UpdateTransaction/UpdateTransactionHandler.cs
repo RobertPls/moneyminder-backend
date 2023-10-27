@@ -78,19 +78,9 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             if (newCategory == null) return new Result(false, "Update Simple transaction need categoryId");
             if (newCategory.UserProfileId != userProfile) return new Result(false, "The user is not the owner of this category");
 
-            var oldType = transaction.Type;
-            decimal oldAmount = transaction.Amount;
-            Guid oldAccountId = transaction.AccountId;
-
             var newtype = request.Type == Dto.Transactions.TransactionType.Income ? TransactionType.Income : TransactionType.Outcome;
 
-            transaction.UpdateType(newtype);
-            transaction.UpdateDate(request.Date);
-            transaction.UpdateDescription(request.Description);
-            transaction.UpdateAmout(request.Amount);
-            transaction.UpdateCategory(newCategory.Id);
-            transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type, false);
+            transaction.Update(request.Description, request.Amount, request.Date, request.OriginAccountId, newCategory.Id, null, newtype, false);
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -111,27 +101,25 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             if (destinationAccount.UserProfileId != userProfile) return new Result(false, "The user is not the owner of this destination Account");
 
             var transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(destinationAccount.Id, null, request.Date, request.Amount, "Transference", true);
-            
-            transactionInDestinationAccount.AddTransacionRelation(transaction.Id);
+
+            transactionInDestinationAccount.AddTransferenceRelation(transaction.Id);
 
             await _transactionRepository.CreateAsync(transactionInDestinationAccount);
 
             await _unitOfWork.Commit();
 
-            var oldType = transaction.Type;
-            decimal oldAmount = transaction.Amount;
-            Guid oldAccountId = transaction.AccountId;
-
             var newtype = TransactionType.Outcome;
 
-            transaction.AddTransacionRelation(transactionInDestinationAccount.Id);
-            transaction.UpdateType(newtype);
-            transaction.UpdateDate(request.Date);
-            transaction.UpdateDescription(request.Description);
-            transaction.UpdateAmout(request.Amount);
-            transaction.RemoveCategoryRelation();
-            transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId,transaction.AccountId,oldAmount,transaction.Amount,oldType,transaction.Type, true);
+            transaction.Update(
+                request.Description,
+                request.Amount,
+                request.Date,
+                request.OriginAccountId,
+                null,
+                transactionInDestinationAccount.Id,
+                newtype,
+                true
+                );
 
             await _transactionRepository.UpdateAsync(transaction);
 
@@ -150,31 +138,33 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             var relatedTransaction = await _transactionRepository.FindByIdAsync(transaction.RelatedTransactionId??Guid.Empty);
             if (relatedTransaction == null) return new Result(false, "RelatedTransaction not found");
 
-            transaction.RemoveTransacionRelation();
-            relatedTransaction.RemoveTransacionRelation();
+            var newtype = request.Type == Dto.Transactions.TransactionType.Income ? TransactionType.Income : TransactionType.Outcome;
+
+            transaction.Update(
+                request.Description,
+                request.Amount,
+                request.Date,
+                request.OriginAccountId,
+                newCategory.Id,
+                null,
+                newtype,
+                false
+                );
+
+            relatedTransaction.RemoveTransferenceRelation();
+
+            //Se coloca false en el isTransfer ya que las dos transacciones se separaron y se manejan como
+            //dos distintas para que la eliminacion si afecte al balance general
+
+            relatedTransaction.DeleteTransaction(false);
 
             await _transactionRepository.UpdateAsync(transaction);
+
             await _transactionRepository.UpdateAsync(relatedTransaction);
 
             await _unitOfWork.Commit();
 
             await _transactionRepository.RemoveAsync(relatedTransaction);
-
-            var oldType = transaction.Type;
-            decimal oldAmount = transaction.Amount;
-            Guid oldAccountId = transaction.AccountId;
-
-            var newtype = request.Type == Dto.Transactions.TransactionType.Income ? TransactionType.Income : TransactionType.Outcome;
-
-            transaction.UpdateType(newtype);
-            transaction.UpdateDate(request.Date);
-            transaction.UpdateDescription(request.Description);
-            transaction.UpdateAmout(request.Amount);
-            transaction.UpdateCategory(newCategory.Id);
-            transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type, false);
-
-            await _transactionRepository.UpdateAsync(transaction);
 
             await _unitOfWork.Commit();
 
@@ -195,36 +185,34 @@ namespace Application.UseCase.Command.Transactions.UpdateTransaction
             if (relatedTransaction == null) return new Result(false, "RelatedTransaction not found");
 
 
-            var oldType = transaction.Type;
-            decimal oldAmount = transaction.Amount;
-            Guid oldAccountId = transaction.AccountId;
-
             var newtype = TransactionType.Outcome;
 
-            transaction.UpdateType(newtype);
-            transaction.UpdateDate(request.Date);
-            transaction.UpdateDescription("Transference");
-            transaction.UpdateAmout(request.Amount);
-            transaction.RemoveCategoryRelation();
-            transaction.UpdateAccount(request.OriginAccountId);
-            transaction.Updated(oldAccountId, transaction.AccountId, oldAmount, transaction.Amount, oldType, transaction.Type, true);
-
-            await _transactionRepository.UpdateAsync(transaction);
-
-
-            var oldTypeRelatedTransaction = relatedTransaction.Type;
-            decimal oldAmountRelatedTransaction = relatedTransaction.Amount;
-            Guid oldAccountIdRelatedTransaction = relatedTransaction.AccountId;
+            transaction.Update(
+                "Transference",
+                request.Amount,
+                request.Date,
+                request.OriginAccountId,
+                null,
+                transaction.RelatedTransactionId,
+                newtype,
+                false
+                );
 
             var newtypeRelatedTransaction = TransactionType.Income;
 
-            relatedTransaction.UpdateType(newtypeRelatedTransaction);
-            relatedTransaction.UpdateDate(request.Date);
-            relatedTransaction.UpdateDescription("Transference");
-            relatedTransaction.UpdateAmout(request.Amount);
-            relatedTransaction.RemoveCategoryRelation();
-            relatedTransaction.UpdateAccount(destinationAccount.Id);
-            relatedTransaction.Updated(oldAccountIdRelatedTransaction, relatedTransaction.AccountId, oldAmountRelatedTransaction, relatedTransaction.Amount, oldTypeRelatedTransaction, relatedTransaction.Type, true);
+            relatedTransaction.Update(
+                "Transference",
+                request.Amount,
+                request.Date,
+                destinationAccount.Id,
+                null,
+                transaction.RelatedTransactionId,
+                newtypeRelatedTransaction,
+                false
+                );
+
+
+            await _transactionRepository.UpdateAsync(transaction);
 
             await _transactionRepository.UpdateAsync(relatedTransaction);
 

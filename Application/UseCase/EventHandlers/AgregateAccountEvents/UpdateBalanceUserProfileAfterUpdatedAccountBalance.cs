@@ -11,21 +11,29 @@ using System.Threading.Tasks;
 
 namespace Application.UseCase.EventHandlers.AgregateAccountEvents
 {
-    public class UpdateBalanceUserProfileAfterDecreaseAccountBalance : INotificationHandler<DecreasedAccountBalance>
+    public class UpdateBalanceUserProfileAfterUpdatedAccountBalance : INotificationHandler<UpdatedAccountBalance>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateBalanceUserProfileAfterDecreaseAccountBalance(IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IUnitOfWork unitOfWort)
+        public UpdateBalanceUserProfileAfterUpdatedAccountBalance(IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IUnitOfWork unitOfWort)
         {
             _accountRepository = accountRepository;
             _userProfileRepository = userProfileRepository;
             _unitOfWork = unitOfWort;
         }
 
-        public async Task Handle(DecreasedAccountBalance notification, CancellationToken cancellationToken)
+        public async Task Handle(UpdatedAccountBalance notification, CancellationToken cancellationToken)
         {
+            System.Diagnostics.Debug.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++");
+            System.Diagnostics.Debug.WriteLine("UpdateBalanceUserProfileAfterUpdatedAccountBalance");
+
+            System.Diagnostics.Debug.WriteLine(notification);
+
+            System.Diagnostics.Debug.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++");
+
+
             var account = await _accountRepository.FindByIdAsync(notification.AccountId);
 
             if (account == null)
@@ -41,11 +49,10 @@ namespace Application.UseCase.EventHandlers.AgregateAccountEvents
                 throw new NullReferenceException("User profile is null, it's not possible to update its balance.");
             }
 
-            userProfile.DecreaseBalance(notification.Ammount);
+            userProfile.UpdateBalance(notification.Ammount, notification.Type);
 
-            await _accountRepository.UpdateAsync(account);
+            await _userProfileRepository.UpdateAsync(userProfile);
 
-            await _unitOfWork.Commit();
         }
     }
 }

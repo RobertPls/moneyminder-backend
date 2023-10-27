@@ -56,9 +56,9 @@ namespace Application.UseCase.Command.Transferences.CreateTransference
 
             Transaction transactionInDestinationAccount = _transactionFactory.CreateIncomeTransaction(request.DestinationAccountId, null, request.Date, request.Amount, "Transference", true);
 
-            transactionInOriginAccount.AddTransacionRelation(transactionInDestinationAccount.Id);
+            transactionInOriginAccount.AddTransferenceRelation(transactionInDestinationAccount.Id);
 
-            transactionInDestinationAccount.AddTransacionRelation(transactionInOriginAccount.Id);
+            transactionInDestinationAccount.AddTransferenceRelation(transactionInOriginAccount.Id);
 
             await _transactionRepository.CreateAsync(transactionInOriginAccount);
 

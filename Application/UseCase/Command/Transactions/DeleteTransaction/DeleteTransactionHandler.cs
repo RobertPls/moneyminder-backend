@@ -40,34 +40,33 @@ namespace Application.UseCase.Command.Transactions.DeleteTransaction
             if (relatedTransactionId != null)
             {
                 var relatedTransaction = await _transactionRepository.FindByIdAsync(relatedTransactionId.Value);
-                if (relatedTransaction == null)return new Result(false, "Related Transaction not found");                
+                if (relatedTransaction == null)return new Result(false, "Related Transaction not found");
 
-                relatedTransaction.RemoveTransacionRelation();
-                
-                transaction.RemoveTransacionRelation();
+
+                relatedTransaction.DeleteTransaction(true);
+
+                transaction.DeleteTransaction(true);
+
 
                 await _transactionRepository.UpdateAsync(relatedTransaction);
 
                 await _transactionRepository.UpdateAsync(transaction);
 
+                
                 await _unitOfWork.Commit();
 
-                relatedTransaction.Deleted(true);
-
-                transaction.Deleted(true);
 
                 await _transactionRepository.RemoveAsync(relatedTransaction);
                 
                 await _transactionRepository.RemoveAsync(transaction);
 
-
                 await _unitOfWork.Commit();
             }
             else
             {
-                await _transactionRepository.RemoveAsync(transaction);
+                transaction.DeleteTransaction(false);
 
-                transaction.Deleted(false);
+                await _transactionRepository.RemoveAsync(transaction);
 
                 await _unitOfWork.Commit();
             }

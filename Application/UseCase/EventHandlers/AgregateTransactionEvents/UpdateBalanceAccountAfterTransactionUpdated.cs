@@ -1,9 +1,12 @@
 ﻿using Domain.Events.Transactions;
 using Domain.Factories.Accounts;
+using Domain.Models.Accounts;
 using Domain.Models.Transactions;
 using Domain.Repositories.Accounts;
+using Domain.Repositories.UserProfiles;
 using MediatR;
 using SharedKernel.Core;
+using System.Security.Principal;
 
 namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
 {
@@ -12,13 +15,15 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IAccountFactory _accountFactory;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateBalanceAccountAfterTransactionUpdated(IAccountRepository accountRepository, IAccountFactory accountFactory, IUnitOfWork unitOfWort)
+        public UpdateBalanceAccountAfterTransactionUpdated(IAccountRepository accountRepository, IUserProfileRepository userProfileRepository, IAccountFactory accountFactory, IUnitOfWork unitOfWort)
         {
             _accountRepository = accountRepository;
             _accountFactory = accountFactory;
             _unitOfWork = unitOfWort;
+            _userProfileRepository = userProfileRepository;
         }
 
         public async Task Handle(UpdatedTransaction notification, CancellationToken cancellationToken)
@@ -31,45 +36,28 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
                 throw new NullReferenceException("User account is null, it's not possible to update its balance.");
             }
 
-            if(oldAccount.Id == newAccount.Id && notification.OldType == notification.NewType)
-            {
-                if (notification.NewType == TransactionType.Income)
-                {
-                    newAccount.DecreaseBalance(notification.OldAmount, notification.IsTransference);
-                    newAccount.IncreaseBalance(notification.NewAmount, notification.IsTransference);
-                }
-                else
-                {
-                    newAccount.IncreaseBalance(notification.OldAmount, notification.IsTransference);
-                    newAccount.DecreaseBalance(notification.NewAmount, notification.IsTransference);
-                }
-            }
-            else
-            {
-                if (notification.OldType == TransactionType.Income)
-                {
-                    oldAccount.DecreaseBalance(notification.OldAmount, notification.IsTransference);
-                }
-                else
-                {
-                    oldAccount.IncreaseBalance(notification.OldAmount, notification.IsTransference);
-                }
+            var oldType = notification.OldType == TransactionType.Outcome ? TransactionType.Income : TransactionType.Outcome;
+            
+            oldAccount.UpdateBalance(notification.OldAmount, oldType, notification.IsTransference);
 
-                if (notification.NewType == TransactionType.Income)
-                {
-                    newAccount.IncreaseBalance(notification.NewAmount, notification.IsTransference);
-                }
-                else
-                {
-                    newAccount.DecreaseBalance(notification.NewAmount, notification.IsTransference);
-                }
-            }
+            newAccount.UpdateBalance(notification.NewAmount, notification.NewType, notification.IsTransference);
 
 
             await _accountRepository.UpdateAsync(oldAccount);
             await _accountRepository.UpdateAsync(newAccount);
 
-            await _unitOfWork.Commit();
+            if (!notification.IsTransference)
+            {
+                var userProfile = await _userProfileRepository.FindByIdAsync(newAccount.UserProfileId);
+
+                if (userProfile == null)
+                {
+                    throw new NullReferenceException("User profile is null, it's not possible to update its balance.");
+                }
+                userProfile.UpdateBalance(notification.OldAmount, oldType);
+                userProfile.UpdateBalance(notification. NewAmount, notification.NewType);
+                await _userProfileRepository.UpdateAsync(userProfile);
+            }
 
         }
     }

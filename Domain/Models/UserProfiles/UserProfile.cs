@@ -1,4 +1,6 @@
-﻿using Domain.ValueObjects;
+﻿using Domain.Events.UserProfiles;
+using Domain.Models.Transactions;
+using Domain.ValueObjects;
 using SharedKernel.Core;
 
 namespace Domain.Models.UserProfiles
@@ -25,18 +27,25 @@ namespace Domain.Models.UserProfiles
 
         public UserProfile() { }
 
-        public void IncreaseBalance(decimal amount)
+        public void UpdateBalance(decimal amount, TransactionType type)
         {
             MoneyValue amountMoney = new MoneyValue(amount);
 
-            Balance = Balance + amountMoney;
+
+            if (type == TransactionType.Income)
+            {
+                Balance = Balance + amountMoney.Value;
+            }
+            else
+            {
+                Balance = Balance - amountMoney;
+            }
+
         }
 
-        public void DecreaseBalance(decimal amount)
+        public void Created()
         {
-            MoneyValue amountMoney = new MoneyValue(amount);
-
-            Balance = Balance - amountMoney;
+            AddDomainEvent(new CreatedUserProfile(Id));
         }
     }
 }

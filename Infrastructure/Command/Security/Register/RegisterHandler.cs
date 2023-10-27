@@ -63,9 +63,11 @@ namespace Infrastructure.Command.Security.Register
                         
                         await _unitOfWork.Commit();
 
-                        var domainEvent = new CreatedUserProfile(userProfile.Id);
-                        
-                        await _mediator.Publish(domainEvent);
+                        userProfile.Created();
+
+                        await _userProfileRepository.UpdateAsync(userProfile);
+
+                        await _unitOfWork.Commit();
 
                         return new Result(true, "User created");
                     }
