@@ -26,14 +26,7 @@ namespace Application.UseCase.EventHandlers.AgregateAccountEvents
 
         public async Task Handle(UpdatedAccountBalance notification, CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debug.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.Diagnostics.Debug.WriteLine("UpdateBalanceUserProfileAfterUpdatedAccountBalance");
-
-            System.Diagnostics.Debug.WriteLine(notification);
-
-            System.Diagnostics.Debug.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++");
-
-
+            /*
             var account = await _accountRepository.FindByIdAsync(notification.AccountId);
 
             if (account == null)
@@ -51,7 +44,7 @@ namespace Application.UseCase.EventHandlers.AgregateAccountEvents
 
             userProfile.UpdateBalance(notification.Ammount, notification.Type);
 
-            await _userProfileRepository.UpdateAsync(userProfile);
+            await _userProfileRepository.UpdateAsync(userProfile);*/
 
         }
     }

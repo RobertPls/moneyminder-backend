@@ -44,20 +44,31 @@ namespace Application.UseCase.EventHandlers.AgregateTransactionEvents
 
 
             await _accountRepository.UpdateAsync(oldAccount);
+
             await _accountRepository.UpdateAsync(newAccount);
 
-            if (!notification.IsTransference)
-            {
-                var userProfile = await _userProfileRepository.FindByIdAsync(newAccount.UserProfileId);
 
-                if (userProfile == null)
-                {
-                    throw new NullReferenceException("User profile is null, it's not possible to update its balance.");
-                }
-                userProfile.UpdateBalance(notification.OldAmount, oldType);
-                userProfile.UpdateBalance(notification. NewAmount, notification.NewType);
-                await _userProfileRepository.UpdateAsync(userProfile);
+            var userProfile = await _userProfileRepository.FindByIdAsync(newAccount.UserProfileId);
+
+
+            if (userProfile == null)
+            {
+                throw new NullReferenceException("User profile is null, it's not possible to update its balance.");
             }
+            
+            if(!notification.WasTransference && notification.IsTransference)
+            {
+                userProfile.UpdateBalance(notification.OldAmount, oldType);
+            }
+            else if ((!notification.WasTransference && !notification.IsTransference) || notification.WasTransference && !notification.IsTransference)
+            {
+                userProfile.UpdateBalance(notification.OldAmount, oldType);
+                userProfile.UpdateBalance(notification.NewAmount, notification.NewType);
+            }
+
+
+            await _userProfileRepository.UpdateAsync(userProfile);
+            
 
         }
     }

@@ -42,6 +42,7 @@ namespace Domain.Models.Transactions
                 throw new BussinessRuleValidationException("The account cannot be empty");
             }
 
+            var wasTransfer = RelatedTransactionId != null;
             var oldType = Type;
             var oldAccount = AccountId;
             var oldAmount = Amount;
@@ -54,7 +55,7 @@ namespace Domain.Models.Transactions
             Amount = new MoneyValue(amount);
             Type = type;
 
-            AddDomainEvent(new UpdatedTransaction(oldAccount, accountId, oldAmount, amount, oldType, type ,isTransference));
+            AddDomainEvent(new UpdatedTransaction(oldAccount, accountId, oldAmount, amount, oldType, type ,wasTransfer, isTransference));
 
         }
 
