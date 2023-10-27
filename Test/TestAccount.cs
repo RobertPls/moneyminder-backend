@@ -17,10 +17,10 @@ namespace Test
             Account account = new Account(userProfileId, accountName, description);
 
             // Assert
-            Assert.NotNull(account.Name);
-            Assert.Equal(accountName, account.Name);
+            Assert.NotNull(account);
             Assert.Equal(userProfileId, account.UserProfileId);
-            Assert.Equal(description, account.Description);
+            Assert.Equal(accountName, account.Name.AccountName);
+            Assert.Equal(description, account.Description.Description);
             Assert.Equal(0, account.Balance);
         }
 
@@ -35,15 +35,14 @@ namespace Test
 
             // Act
             string newAccountName = "NewAccountName";
-            account.UpdateName(newAccountName);
+            account.UpdateAccount(newAccountName, description);
 
             // Assert
-            Assert.NotNull(account.Name);
-            Assert.Equal(newAccountName, account.Name);
+            Assert.Equal(newAccountName, account.Name.AccountName);
         }
 
         [Fact]
-        public void AccountIncreaseBalance_Should_Correct()
+        public void AccountUpdateDescription_Should_Correct()
         {
             // Setup
             Guid userProfileId = Guid.NewGuid();
@@ -52,41 +51,22 @@ namespace Test
             Account account = new Account(userProfileId, accountName, description);
 
             // Act
-            decimal increaseAmount = 100;
-            account.IncreaseBalance(increaseAmount, false);
+            string newDescription = "New Account Description";
+            account.UpdateAccount(accountName, newDescription);
 
             // Assert
-            Assert.Equal(increaseAmount, account.Balance);
+            Assert.Equal(newDescription, account.Description.Description);
         }
 
         [Fact]
-        public void AccountDecreaseBalance_Should_Correct()
-        {
-            // Setup
-            Guid userProfileId = Guid.NewGuid();
-            string accountName = "TestAccount";
-            string description = "Test Account Description";
-            Account account = new Account(userProfileId, accountName, description);
-            decimal initialBalance = 100;
-            account.IncreaseBalance(initialBalance, false);
-
-            // Act
-            decimal decreaseAmount = 50;
-            account.DecreaseBalance(decreaseAmount, false);
-
-            // Assert
-            Assert.Equal(initialBalance - decreaseAmount, account.Balance);
-        }
-
-        [Fact]
-        public void AccountCreation_Should_Incorrect()
+        public void AccountCreation_WithEmptyUserProfileId_Should_ThrowException()
         {
             // Setup
             Guid userProfileId = Guid.Empty;
             string accountName = "TestAccount";
             string description = "Test Account Description";
 
-            // Act
+            // Act & Assert
             Action act = () =>
             {
                 Account account = new Account(userProfileId, accountName, description);
@@ -95,6 +75,7 @@ namespace Test
             // Assert
             var exception = Assert.Throws<BussinessRuleValidationException>(act);
             var expectedExceptionMessage = "The user cannot be empty";
+
             Assert.NotNull(exception);
             Assert.Equal(expectedExceptionMessage, exception.Message);
         }

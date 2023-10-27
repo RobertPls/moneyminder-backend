@@ -1,4 +1,6 @@
-﻿using Domain.Models.UserProfiles;
+﻿using Domain.Events.UserProfiles;
+using Domain.Models.Transactions;
+using Domain.Models.UserProfiles;
 using SharedKernel.Core;
 
 namespace Test
@@ -8,7 +10,7 @@ namespace Test
         [Fact]
         public void UserProfileCreation_Should_Correct()
         {
-            // Arrange
+            // Setup
             Guid userId = Guid.NewGuid();
             string fullName = "Robert Perez";
 
@@ -23,50 +25,72 @@ namespace Test
         }
 
         [Fact]
-        public void UserProfileCreation_WithEmptyUserId_Should_ThrowException()
+        public void UserProfileCreation_WithEmptyUserId_Should_Incorrect()
         {
-            // Arrange
+            // Setup
             Guid userId = Guid.Empty;
             string fullName = "Robert Perez";
 
-            // Act & Assert
-            Assert.Throws<BussinessRuleValidationException>(() => new UserProfile(userId, fullName));
+            // Act
+            Action act = () =>
+            {
+                UserProfile userProfile = new UserProfile(userId, fullName);
+            };
+            var exception = Assert.Throws<BussinessRuleValidationException>(act);
+            var expectedExeption = "The user cannot be empty";
+            
+            //Assert         
+            Assert.NotNull(exception);
+            Assert.Equal(exception.Message, expectedExeption);
         }
 
         [Fact]
-        public void UserProfileIncreaseBalance_Should_Correct()
+        public void UserProfileUpdateBalance_Income_Should_Correct()
+        {
+            // Setup
+            Guid userId = Guid.NewGuid();
+            string fullName = "Robert Perez";
+            UserProfile userProfile = new UserProfile(userId, fullName);
+
+            // Act
+            decimal amount = 100;
+            userProfile.UpdateBalance(amount, TransactionType.Income);
+
+            // Assert
+            Assert.Equal(amount, userProfile.Balance);
+        }
+
+        [Fact]
+        public void UserProfileUpdateBalance_Outcome_Should_Correct()
+        {
+            // Setup
+            Guid userId = Guid.NewGuid();
+            string fullName = "Robert Perez";
+            UserProfile userProfile = new UserProfile(userId, fullName);
+            userProfile.UpdateBalance(200, TransactionType.Income);
+
+            // Act
+            decimal amount = 50;
+            userProfile.UpdateBalance(amount, TransactionType.Outcome);
+
+            // Assert
+            Assert.Equal(150, userProfile.Balance);
+        }
+
+        [Fact]
+        public void UserProfileCreated_Should_AddCreatedUserProfileEvent()
         {
             // Arrange
             Guid userId = Guid.NewGuid();
             string fullName = "Robert Perez";
-            int initialBalance = 100;
             UserProfile userProfile = new UserProfile(userId, fullName);
-            userProfile.IncreaseBalance(initialBalance);
 
             // Act
-            int amountToIncrease = 50;
-            userProfile.IncreaseBalance(amountToIncrease);
+            userProfile.Created();
 
             // Assert
-            Assert.Equal(initialBalance + amountToIncrease, userProfile.Balance);
-        }
-
-        [Fact]
-        public void UserProfileDecreaseBalance_Should_Correct()
-        {
-            // Arrange
-            Guid userId = Guid.NewGuid();
-            string fullName = "Robert Perez";
-            int initialBalance = 100;
-            UserProfile userProfile = new UserProfile(userId, fullName);
-            userProfile.IncreaseBalance(initialBalance);
-
-            // Act
-            int amountToDecrease = 30;
-            userProfile.DecreaseBalance(amountToDecrease);
-
-            // Assert
-            Assert.Equal(initialBalance - amountToDecrease, userProfile.Balance);
+            Assert.Single(userProfile.DomainEvents);
+            Assert.IsType<CreatedUserProfile>(userProfile.DomainEvents.First());
         }
     }
 }

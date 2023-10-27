@@ -4,7 +4,7 @@ using SharedKernel.Core;
 namespace Test
 {
 
-    public class TestTipoProyecto
+    public class TestCategory
     {
         [Fact]
         public void CategoryCreation_Should_Correct()
@@ -23,7 +23,7 @@ namespace Test
         }
 
         [Fact]
-        public void CategoryUpdateName_Should_Correct()
+        public void CategoryUpdate_Should_Correct()
         {
             // Setup
             Guid userProfileId = Guid.NewGuid();
@@ -33,7 +33,7 @@ namespace Test
 
             // Act
             string newCategoryName = "NewCategoryName";
-            category.UpdateName(newCategoryName);
+            category.UpdateCategory(newCategoryName);
 
             // Assert
             Assert.NotNull(category.Name);
